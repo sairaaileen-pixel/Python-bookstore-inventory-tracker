@@ -11,27 +11,48 @@ Before your final push you'll rename this folder to analysis/.
 """
 import json
 
+CATEGORY_THRESHOLDS = {
+    "PPE": 15,
+    "Wound Care": 15,
+    "Medication": 10,
+    "Equipment": 5,
+}
 
-class YourInventoryItem:
-    """
-    TODO: rename this class to something that fits your scenario, and
-    write a real docstring. What does one of these represent? At minimum
-    you'll need a name and a quantity. Add what your stakeholder asked
-    for, not more and not less.
-    """
 
-    def __init__(self):
+class HealthcareSupply :
+
+    """Represents a single healthcare supply item and its current stock."""
+    
+    #TODO: rename this class to something that fits your scenario, and
+    #write a real docstring. What does one of these represent? At minimum
+    #you'll need a name and a quantity. Add what your stakeholder asked
+    #for, not more and not less.
+
+
+    def __init__(self, name, quantity, category):
+        """Initialize a healthcare supply item with name, quantity, and category."""
         # TODO: add your own parameters (self, plus each attribute you're
         # tracking) and store each one as self.whatever = whatever.
-        pass
 
-    def is_low_stock(self):
-        """TODO: write your own docstring."""
-        # TODO: return True or False. Your stakeholder didn't say what
+        self.name = name
+        self.quantity = quantity
+        self.category = category
+
+# TODO: return True or False. Your stakeholder didn't say what
         # "low" means, so decide, and write down the assumption in
         # REFLECTION.md's "Assumptions" section.
-        pass
-
+        
+    def is_low_stock(self):
+       """Return True if quantity is below this item's category threshold."""    
+       if self.category in CATEGORY_THRESHOLDS:
+        limit = CATEGORY_THRESHOLDS[self.category]
+       else:
+        limit = 10
+       if self.quantiy < limit:
+          return True, f"low stock: {self.quantity} is bellow {limit}"
+       else:
+          return False, f" {self.quantity} is above {limit}"
+      
 
 def read_batch_file(filepath):
     """
