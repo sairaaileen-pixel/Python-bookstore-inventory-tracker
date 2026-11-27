@@ -17,13 +17,13 @@
 > would you check it?
 
 1. Assumption 1
-   - **Question:** _TODO_
-   - **Assumption:** _TODO_
-   - **Risk:** _TODO_
+   - **Question:** How many units left in stock count as "low stock" for each supply category?
+   - **Assumption:** Stock is low when quantity is below the category limit (PPE: less than 20, Wound Care: less than 15, Medication: less than 15, Equipment: less than 10).
+   - **Risk:** If a supply is used fast during busy clinic days, waiting until those numbers could leave too little time to restock—or set the bar too high and cause constant false alarms.
 2. Assumption 2
-   - **Question:** _TODO_
-   - **Assumption:** _TODO_
-   - **Risk:** _TODO_
+   - **Question:** What should happen if a REMOVE line asks to take out more units than are currently on hand?
+   - **Assumption:** Skip the line and print a warning so stock never goes below zero.
+   - **Risk:** If the log happened because an earlier ADD was missed or miscounted, skipping the REMOVE could hide a real stock drop or leave the count slightly high.
 
 ## The 3+ edge cases you found and handled
 
