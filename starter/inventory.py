@@ -12,12 +12,12 @@ Before your final push you'll rename this folder to analysis/.
 import json
 
 CATEGORY_THRESHOLDS = {
-    "PPE": 15,
+    "PPE": 20,
     "Wound Care": 15,
-    "Medication": 10,
-    "Equipment": 5,
+    "Medication": 15,
+    "Equipment": 10,
 }
-
+Supply = "../data/healthcare_transactions.txt"
 
 class HealthcareSupply :
 
@@ -44,26 +44,33 @@ class HealthcareSupply :
         
     def is_low_stock(self):
        """Return True if quantity is below this item's category threshold."""    
-       if self.category in CATEGORY_THRESHOLDS:
-        limit = CATEGORY_THRESHOLDS[self.category]
+       limit = CATEGORY_THRESHOLDS.get(self.category, 10)
+       if self.quantity < limit:
+          return True, f"Low stock: only {self.quantity} {self.name} available"
        else:
-        limit = 10
-       if self.quantiy < limit:
-          return True, f"low stock: {self.quantity} is bellow {limit}"
-       else:
-          return False, f" {self.quantity} is above {limit}"
-      
+          return False, f"{self.quantity} {self.name} available"
+
+# Testing print delete when finished
+          
+a = HealthcareSupply("Face Shields", 5, "PPE")
+b = HealthcareSupply("Pulse Oximeters", 30, "Equipment")
+print(a.is_low_stock())
+print(b.is_low_stock())
 
 def read_batch_file(filepath):
-    """
-    Read the batch file at `filepath` and return a list of its lines
-    (strings), unchanged. Deciding whether a line is usable happens in
-    validate_line(), not here. Use this docstring as the model for the
-    ones you write below: what the function does, what it takes, and what
-    it returns.
-    """
+    """Read the batch file and return its lines unchanged"""
+    lines = []
+    with open(filepath, "r", encoding="utf-8") as f:
+       for line in f.read().splitlines():
+               lines.append(line) 
+    return lines
+
+    #Read the batch file at `filepath` and return a list of its lines
+    #(strings), unchanged. Deciding whether a line is usable happens in
+    #validate_line(), not here. Use this docstring as the model for the
+    #ones you write below: 
     # TODO: implement
-    pass
+    
 
 
 def validate_line(line):
@@ -107,7 +114,7 @@ def print_summary(items):
 
 
 # TODO: point this at the data file for the scenario you chose.
-lines = read_batch_file("data/____________.txt")
+lines = read_batch_file("data/healthcare_transactions.txt")
 items = process_transactions(lines)
 print_summary(items)
 export_to_json(items)
