@@ -17,11 +17,10 @@ CATEGORY_THRESHOLDS = {
     "Medication": 15,
     "Equipment": 10,
 }
-Supply = "../data/healthcare_transactions.txt"
 
 class HealthcareSupply :
 
-    """Represents a single healthcare supply item and its current stock."""
+    """Represents a medical supply item, its current stock, and its category."""
     
     #TODO: rename this class to something that fits your scenario, and
     #write a real docstring. What does one of these represent? At minimum
@@ -30,7 +29,7 @@ class HealthcareSupply :
 
 
     def __init__(self, name, quantity, category):
-        """Initialize a healthcare supply item with name, quantity, and category."""
+        """Store name, quantity, and category for a supply item."""
         # TODO: add your own parameters (self, plus each attribute you're
         # tracking) and store each one as self.whatever = whatever.
 
@@ -43,19 +42,32 @@ class HealthcareSupply :
         # REFLECTION.md's "Assumptions" section.
         
     def is_low_stock(self):
-       """Return True if quantity is below this item's category threshold."""    
+       """Return True when item quantity is below its category threshold."""    
        limit = CATEGORY_THRESHOLDS.get(self.category, 10)
-       if self.quantity < limit:
-          return True, f"Low stock: only {self.quantity} {self.name} available"
-       else:
-          return False, f"{self.quantity} {self.name} available"
+       return self.quantity < limit
 
+    def stock_status_message(self):
+        """Return a readable stock alert or availability message for this item."""
+        limit = CATEGORY_THRESHOLDS.get(self.category, 10)
+        if self.is_low_stock():
+            return (
+                f"Low stock: only {self.quantity} {self.name} available "
+                f"(threshold: {limit})"
+            )
+        return f"{self.quantity} {self.name} available"
+        
 # Testing print delete when finished
           
 a = HealthcareSupply("Face Shields", 5, "PPE")
 b = HealthcareSupply("Pulse Oximeters", 30, "Equipment")
 print(a.is_low_stock())
 print(b.is_low_stock())
+
+test_low = HealthcareSupply("Gloves", 5, "PPE")
+test_ok = HealthcareSupply("Stethoscope", 20, "Equipment")
+print(test_low.stock_status_message())
+print(test_ok.stock_status_message())
+
 
 def read_batch_file(filepath):
     """Read the batch file and return its lines unchanged"""
@@ -77,20 +89,81 @@ def validate_line(line):
     """TODO: write your own docstring. What makes an ADD, REMOVE, or
     SEARCH line valid? What do you return for a valid line, and what for
     an invalid one?"""
+
+    """Return a parsed tuple for valid ADD, REMOVE, or SEARCH lines, or print a skip reason and return None."""
     # TODO: implement. One choice worth making on purpose: a quantity can
     # be present but not a number ("five"). Wrap int(quantity) in a
     # try/except ValueError. That asks Python "did this work?" instead
     # of trying to predict every way it could fail.
-    pass
+    
 
+    if not line or not line.strip():
+        print("SKIPPED - blank line")
+        return None
+
+    parts = line.split(",")
+    command = parts[0].strip().upper()
+
+    # ADD command
+
+    if command == "ADD":
+        if len(parts) != 4:
+            print(f"SKIPPED - ADD requires 4 fields: {line}")
+            return None
+        name = parts[1].strip()
+        category = parts[3].strip()
+        if not name or not category:
+            print(f"SKIPPED - missing supply name or category: {line}")
+            return None
+        try:
+            quantity = int(parts[2].strip())
+        except ValueError:
+            print(f"SKIPPED - quantity is not whole number: {line}")
+            return None
+        if quantity <= 0:
+            print(f"SKIPPED - ADD quantity must be positive: {line}")
+            return None
+        return ("ADD", name, quantity, category)
+
+    # REMOVE commad
+    if command == "REMOVE":
+        if len(parts) != 3:
+            print(f"SKIPPED - REMOVE requires 3 fields: {line}")
+            return None
+        name = parts[1].strip()
+        if not name:
+            print(f"SKIPPED - missing supply name: {line}")
+            return None
+        try:
+            quantity = int(parts[2].strip())
+        except ValueError:
+            print(f"SKIPPED - quantity is not a whole number: {line}")
+            return None
+        return ("REMOVE", name, quantity)
+    
+     # SEARCH command
+    if command == "SEARCH":
+        if len(parts) != 2 or not parts[1].strip():
+            print(f"SKIPPED - SEARCH requires a supply name: {line}")
+            return None
+        return("SEARCH", parts[1].strip())
+
+    print(f"SKIPPED - unknown or misspelled command: {line}")
+    return None
+    
 
 def process_transactions(lines):
-    """TODO: write your own docstring."""
+    """Apply valid transaction lines to an inventory dictionary and return it."""
     # TODO: implement. Loop over the lines, apply each valid one to your
     # collection of items, and print a specific message for each line
     # you skip. Return the collection at the end. The full inventory
     # printout is print_summary's job, not this function's.
-    pass
+    
+
+    items = {}
+    for line in lines:
+        parsed =
+
 
 
 def find_item(items, name):
